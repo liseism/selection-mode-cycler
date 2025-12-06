@@ -1,7 +1,7 @@
 schema_version = "1.0.0"
 
 id = "selection_mode_cycler"
-version = "1.0.0"
+version = "1.0.1"
 name = "Selection Mode Cycler"
 tagline = "Cycles through mesh selection modes in Edit Mode"
 maintainer = "Lise"
