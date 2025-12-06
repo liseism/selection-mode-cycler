@@ -2,9 +2,6 @@ import bpy
 
 def cycle_selection_mode(forward=True):
 
-    if bpy.context.active_object is None or bpy.context.active_object.mode != 'EDIT':
-        return
-
     mode_types = ['VERT', 'EDGE', 'FACE']
     current_mode = None
 
@@ -30,6 +27,10 @@ class CycleSelectionModeForwardOperator(bpy.types.Operator):
     bl_idname = "object.cycle_selection_mode_forward"
     bl_label = "Cycle Selection Mode Forward"
 
+    @classmethod
+    def poll(cls, context):
+        return context.active_object != None or bpy.context.active_object.mode != 'EDIT'
+
     def execute(self, context):
         cycle_selection_mode(forward=True)
         return {'FINISHED'}
@@ -37,6 +38,10 @@ class CycleSelectionModeForwardOperator(bpy.types.Operator):
 class CycleSelectionModeBackwardOperator(bpy.types.Operator):
     bl_idname = "object.cycle_selection_mode_backward"
     bl_label = "Cycle Selection Mode Backward"
+
+    @classmethod
+    def poll(cls, context):
+        return context.active_object != None or bpy.context.active_object.mode != 'EDIT'
 
     def execute(self, context):
         cycle_selection_mode(forward=False)
