@@ -1,13 +1,13 @@
 schema_version = "1.0.0"
 
 id = "selection_mode_cycler"
-version = "1.0.1"
+version = "1.1.0"
 name = "Selection Mode Cycler"
 tagline = "Cycles through mesh selection modes in Edit Mode"
 maintainer = "Lise"
 type = "add-on"
 website = "https://extensions.blender.org/add-ons/selection_mode_cycler/"
-blender_version_min = "4.2.0"
+blender_version_min = "5.0.0"
 
 license = [
   "SPDX:GPL-3.0-or-later",

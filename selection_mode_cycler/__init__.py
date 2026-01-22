@@ -1,17 +1,29 @@
 import bpy
 
-def cycle_selection_mode(forward=True):
+def cycle_selection_mode(forward=True, UV = False):
 
-    mode_types = ['VERT', 'EDGE', 'FACE']
+    if bpy.context.scene.tool_settings.use_uv_select_sync == True:
+        UV = False
+
+    if not UV:
+        mode_types = ['VERT', 'EDGE', 'FACE']
+    else:
+        mode_types = ['VERTEX', 'EDGE', 'FACE']
+
     current_mode = None
 
-    if bpy.context.tool_settings.mesh_select_mode[1]:
-        current_mode = 'EDGE'
-    elif bpy.context.tool_settings.mesh_select_mode[2]:
-        current_mode = 'FACE'
-    else:
-        current_mode = 'VERT'
 
+    if not UV: 
+        if bpy.context.tool_settings.mesh_select_mode[1]:
+            current_mode = 'EDGE'
+        elif bpy.context.tool_settings.mesh_select_mode[2]:
+            current_mode = 'FACE'
+        else:
+            current_mode = 'VERT'
+    else:
+        current_mode = bpy.context.tool_settings.uv_select_mode
+
+    
     current_index = mode_types.index(current_mode)
 
     if forward:
@@ -21,7 +33,13 @@ def cycle_selection_mode(forward=True):
         if next_index < 0:
             next_index += len(mode_types)
 
-    bpy.ops.mesh.select_mode(use_extend=False, use_expand=False, type=mode_types[next_index])
+    if not UV:
+        bpy.ops.mesh.select_mode(use_extend=False, use_expand=False, type=mode_types[next_index])
+    else:
+        bpy.ops.uv.select_mode(type=mode_types[next_index])
+    
+
+
 
 class CycleSelectionModeForwardOperator(bpy.types.Operator):
     bl_idname = "object.cycle_selection_mode_forward"
@@ -29,10 +47,11 @@ class CycleSelectionModeForwardOperator(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return context.active_object != None or bpy.context.active_object.mode != 'EDIT'
+        return context.active_object != None and bpy.context.active_object.mode == 'EDIT'
 
     def execute(self, context):
-        cycle_selection_mode(forward=True)
+        UV = context.area.type == 'IMAGE_EDITOR'
+        cycle_selection_mode(True, UV)
         return {'FINISHED'}
 
 class CycleSelectionModeBackwardOperator(bpy.types.Operator):
@@ -41,15 +60,16 @@ class CycleSelectionModeBackwardOperator(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return context.active_object != None or bpy.context.active_object.mode != 'EDIT'
+        return context.active_object != None and bpy.context.active_object.mode == 'EDIT'
 
     def execute(self, context):
-        cycle_selection_mode(forward=False)
+        UV = context.area.type == 'IMAGE_EDITOR'
+        cycle_selection_mode(False, UV)
         return {'FINISHED'}
 
 def add_keymaps():
     wm = bpy.context.window_manager
-    km = wm.keyconfigs.addon.keymaps.new(name='Mesh', space_type='EMPTY')
+    km = wm.keyconfigs.addon.keymaps.new(name='Window', space_type='EMPTY')
 
     kmi_forward = km.keymap_items.new(CycleSelectionModeForwardOperator.bl_idname, 'BUTTON5MOUSE', 'PRESS')
     kmi_backward = km.keymap_items.new(CycleSelectionModeBackwardOperator.bl_idname, 'BUTTON4MOUSE', 'PRESS')
